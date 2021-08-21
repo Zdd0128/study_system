@@ -1,0 +1,66 @@
+version: "3.0"
+
+services:
+  nginx:
+    image: nginx
+    container_name: study_nginx
+    ports:
+      - "85:85"
+      - "8001:8001"
+    restart: always
+    volumes:
+      - ./study_vue/dist:/var/study/html/dist
+      - ./project_api/project_api/static:/var/study_s/static
+      - ./docker_compose_files/nginx:/etc/nginx/conf.d
+    depends_on:
+      - django
+    networks:
+      - web
+
+  django:
+    build:
+      context: ./project_api
+      dockerfile: Dockerfile
+    container_name: study_django
+    restart: always
+    ports:
+      - "8188:8188"
+    volumes:
+      - ./project_api:/soft
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - web
+      
+  redis:
+    image: redis:latest
+    container_name: study_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker_compose_files/redis/data:/data
+      - ./docker_compose_files/redis/redis.conf:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - web
+      
+  mysql:
+    image: mysql:5.7
+    container_name: study_mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./docker_compose_files/mysql.env
+    volumes:
+      - ./docker_compose_files/mysql/data:/var/lib/mysql
+      - ./docker_compose_files/mysql/logs:/var/log/mysql
+      - ./docker_compose_files/mysql/conf:/etc/mysql/conf.d
+    networks:
+      - web
+
+networks:
+  web:
