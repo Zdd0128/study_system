@@ -26,6 +26,7 @@
 3.Celery异步任务发送邮箱,短信,自动批改试卷
 4.Docker-compose一键部署
 5.Nginx负载均衡
+6.MySQL主从同步
 ```
 
 ### 使用说明
